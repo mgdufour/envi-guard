@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Envi Guard — LoRaWAN Environment Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e1117;
+  --bg2: #161b25;
+  --bg3: #1d2535;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #e8eaf0;
+  --text2: #8b90a0;
+  --text3: #555c70;
+  --amber: #f0a500;
+  --amber-dim: rgba(240,165,0,0.12);
+  --amber-dim2: rgba(240,165,0,0.22);
+  --teal: #2dd4a0;
+  --teal-dim: rgba(45,212,160,0.1);
+  --red: #f05a5a;
+  --red-dim: rgba(240,90,90,0.12);
+  --red-dim2: rgba(240,90,90,0.22);
+  --blue: #5b9cf6;
+  --blue-dim: rgba(91,156,246,0.1);
+  --green: #5ec97a;
+  --green-dim: rgba(94,201,122,0.1);
+  --font: 'IBM Plex Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+html { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; }
+body { min-height: 100vh; padding: 0 0 3rem; }
+
+/* ── Header ── */
+.site-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--amber-dim2); border: 1px solid var(--amber);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); animation: pulse 2.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+.logo-name { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; color: var(--text); }
+.logo-sub { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+.header-right { display: flex; align-items: center; gap: 20px; }
+.gateway-status { display: flex; align-items: center; gap: 6px; }
+.gw-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s ease-in-out infinite; }
+.gw-text { font-size: 11px; color: var(--text2); font-family: var(--mono); }
+.course-tag { font-size: 10px; color: var(--text3); font-family: var(--mono); border: 1px solid var(--border2); padding: 2px 8px; border-radius: 4px; }
+.clock { font-family: var(--mono); font-size: 12px; color: var(--text2); min-width: 80px; text-align: right; }
+
+/* ── Main layout ── */
+.main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 0; }
+
+/* ── Section labels ── */
+.section-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── Arch bar ── */
+.arch-bar {
+  display: flex; align-items: center; gap: 0;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px; margin-bottom: 1.25rem;
+  overflow-x: auto; white-space: nowrap;
+}
+.arch-node {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  padding: 4px 10px; border-radius: 4px; color: var(--teal);
+  background: var(--teal-dim); border: 1px solid rgba(45,212,160,0.2);
+  flex-shrink: 0;
+}
+.arch-arrow { color: var(--text3); padding: 0 8px; font-size: 12px; flex-shrink: 0; }
+
+/* ── Two-panel grid ── */
+.two-panel { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; align-items: start; margin-bottom: 1.25rem; }
+
+.panel {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem;
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title { font-size: 12px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.tag {
+  font-family: var(--mono); font-size: 10px; padding: 2px 7px;
+  border-radius: 3px; font-weight: 500;
+}
+.tag-amber { background: var(--amber-dim2); color: var(--amber); border: 1px solid rgba(240,165,0,0.3); }
+.tag-blue  { background: var(--blue-dim);   color: var(--blue);  border: 1px solid rgba(91,156,246,0.3); }
+.tag-red   { background: var(--red-dim2);   color: var(--red);   border: 1px solid rgba(240,90,90,0.3); }
+.tag-green { background: var(--green-dim);  color: var(--green); border: 1px solid rgba(94,201,122,0.3); }
+.tag-teal  { background: var(--teal-dim);   color: var(--teal);  border: 1px solid rgba(45,212,160,0.2); }
+
+/* ── Connector ── */
+.connector {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding-top: 80px; gap: 0;
+}
+.conn-line { width: 1px; background: var(--border2); flex: 1; min-height: 30px; }
+.conn-label {
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  text-align: center; line-height: 1.4; padding: 4px 0; white-space: nowrap;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+}
+.conn-arrow { width: 0; height: 0; border-top: 6px solid var(--border2); border-left: 4px solid transparent; border-right: 4px solid transparent; }
+
+/* ── Room controls ── */
+.room-block { margin-bottom: 1rem; }
+.room-block:last-child { margin-bottom: 0; }
+.room-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.room-name-lbl { font-size: 12px; font-weight: 500; color: var(--text); }
+.room-readings { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+
+.slider-group { margin-bottom: 4px; }
+.slider-row-lbl { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.s-lbl { font-size: 10px; color: var(--text3); }
+.s-val { font-size: 10px; font-weight: 500; color: var(--text2); font-variant-numeric: tabular-nums; }
+
+input[type=range] {
+  -webkit-appearance: none; width: 100%; height: 3px;
+  background: var(--bg3); border-radius: 2px; outline: none; margin-bottom: 2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  border-radius: 50%; cursor: pointer; border: 2px solid var(--bg2);
+  transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.temp-range::-webkit-slider-thumb { background: var(--amber); }
+.hum-range::-webkit-slider-thumb  { background: var(--blue); }
+
+.mini-bar { height: 2px; border-radius: 1px; background: var(--bg3); margin-bottom: 8px; overflow: hidden; }
+.mini-fill { height: 100%; border-radius: 1px; transition: width 0.25s, background 0.25s; }
+
+.divider-line { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+/* ── Interval control ── */
+.interval-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+.interval-lbl { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.interval-val { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--amber); min-width: 28px; }
+
+/* ── Stream log ── */
+.log-box {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px;
+  font-family: var(--mono); font-size: 11px;
+  height: 140px; overflow-y: auto; display: flex; flex-direction: column-reverse;
+}
+.log-box::-webkit-scrollbar { width: 4px; }
+.log-box::-webkit-scrollbar-track { background: transparent; }
+.log-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.log-line { padding: 1px 0; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.log-line.lw { color: var(--amber); }
+.log-line.lc { color: var(--red); }
+.log-line.lo { color: var(--teal); }
+.log-empty { color: var(--text3); font-size: 11px; }
+.msg-count { font-family: var(--mono); font-size: 10px; color: var(--text3); text-align: right; margin-top: 4px; }
+
+/* ── State cards ── */
+.state-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1rem; }
+.state-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px;
+  transition: border-color 0.3s, background 0.3s;
+}
+.state-card.s-warn { border-color: var(--amber); background: var(--amber-dim); }
+.state-card.s-crit { border-color: var(--red); background: var(--red-dim); animation: blink 1s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.65} }
+.sc-name { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+.sc-name.sw { color: var(--amber); }
+.sc-name.sc { color: var(--red); }
+.sc-temp { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+.sc-temp.sw { color: var(--amber); }
+.sc-temp.sc { color: var(--red); }
+.sc-hum { font-family: var(--mono); font-size: 10px; color: var(--text3); font-variant-numeric: tabular-nums; }
+
+/* ── Alert feed ── */
+.feed-box {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px;
+  height: 110px; overflow-y: auto; display: flex; flex-direction: column-reverse;
+}
+.feed-box::-webkit-scrollbar { width: 4px; }
+.feed-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.feed-item { display: flex; gap: 8px; padding: 2px 0; font-size: 11px; font-family: var(--mono); }
+.feed-ts { color: var(--text3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.feed-msg { color: var(--text2); }
+.feed-item.fc .feed-msg { color: var(--red); }
+.feed-item.fw .feed-msg { color: var(--amber); }
+.feed-item.fo .feed-msg { color: var(--teal); }
+.feed-empty { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+/* ── Threshold inputs ── */
+.thresh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.thresh-block { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+.thresh-title { font-size: 10px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.thresh-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.thresh-lbl { font-size: 10px; color: var(--text3); }
+.thresh-input {
+  width: 52px; font-family: var(--mono); font-size: 11px; text-align: right;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 4px; padding: 2px 5px; color: var(--text);
+  outline: none;
+}
+.thresh-input:focus { border-color: var(--amber); }
+.apply-btn {
+  width: 100%; padding: 7px; font-family: var(--mono); font-size: 11px;
+  background: transparent; border: 1px solid var(--border2);
+  border-radius: 6px; color: var(--text2); cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.apply-btn:hover { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+
+/* ── Summary strip ── */
+.summary-strip {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.25rem;
+}
+.sum-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+}
+.sum-label { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 4px; }
+.sum-value { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+.sum-value.sv-warn { color: var(--amber); }
+.sum-value.sv-crit { color: var(--red); }
+.sum-value.sv-ok   { color: var(--teal); }
+.sum-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ── Trend chart ── */
+.chart-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem; }
+.chart-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.chart-legend { display: flex; gap: 14px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.legend-sq { width: 8px; height: 8px; border-radius: 2px; }
+
+/* ── Footer ── */
+.site-footer {
+  border-top: 1px solid var(--border); margin-top: 2rem;
+  padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.footer-right { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+@media (max-width: 700px) {
+  .two-panel { grid-template-columns: 1fr; }
+  .connector { display: none; }
+  .summary-strip { grid-template-columns: 1fr 1fr; }
+  .arch-bar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-mark"><div class="logo-dot"></div></div>
+    <div>
+      <div class="logo-name">Envi Guard</div>
+      <div class="logo-sub">LoRaWAN · AWS IoT · IIoT</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="gateway-status">
+      <div class="gw-dot"></div>
+      <span class="gw-text">2 gateways online</span>
+    </div>
+    <span class="course-tag">DTO5389 · Group 4</span>
+    <span class="clock" id="clock">--:--:--</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="arch-bar" style="margin-top:1.25rem;">
+    <div class="arch-node">Dragino LHT65</div>
+    <div class="arch-arrow">&#8594;</div>
+    <div class="arch-node">LoRaWAN gateway</div>
+    <div class="arch-arrow">&#8594;</div>
+    <div class="arch-node">AWS IoT Core</div>
+    <div class="arch-arrow">&#8594;</div>
+    <div class="arch-node">AWS Lambda</div>
+    <div class="arch-arrow">&#8594;</div>
+    <div class="arch-node">Amazon Timestream</div>
+    <div class="arch-arrow">&#8594;</div>
+    <div class="arch-node">Dashboard + Alerts</div>
+  </div>
+
+  <div class="summary-strip" id="summary-strip">
+    <div class="sum-card">
+      <div class="sum-label">active alerts</div>
+      <div class="sum-value sv-ok" id="sum-alerts">0</div>
+      <div class="sum-sub">across all rooms</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">messages sent</div>
+      <div class="sum-value" id="sum-msgs">0</div>
+      <div class="sum-sub">MQTT payloads</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">hottest room</div>
+      <div class="sum-value" id="sum-hot">--°C</div>
+      <div class="sum-sub" id="sum-hot-name">—</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">uptime</div>
+      <div class="sum-value sv-ok" id="sum-uptime">0s</div>
+      <div class="sum-sub">since page load</div>
+    </div>
+  </div>
+
+  <div class="section-label">data stream simulation</div>
+
+  <div class="two-panel">
+
+    <!-- PRODUCER -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Sensor simulator <span class="tag tag-amber">Producer</span></div>
+      </div>
+
+      <div class="interval-row">
+        <span class="interval-lbl">Transmit interval</span>
+        <input type="range" class="temp-range" min="1" max="10" step="1" value="3" id="interval-slider" style="flex:1;" oninput="updateInterval(this.value)">
+        <span class="interval-val" id="interval-lbl">3s</span>
+      </div>
+
+      <div id="room-controls"></div>
+
+      <hr class="divider-line">
+      <div class="panel-title" style="margin-bottom:6px;font-size:11px;">Raw MQTT payload stream <span class="tag tag-amber">outgoing</span></div>
+      <div class="log-box" id="stream-log"><span class="log-empty">Waiting for first transmission…</span></div>
+      <div class="msg-count" id="msg-count">0 messages sent</div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div class="connector">
+      <div class="conn-line"></div>
+      <div class="conn-label">MQTT<br>topic</div>
+      <div class="conn-arrow"></div>
+      <div class="conn-line"></div>
+    </div>
+
+    <!-- CONSUMER -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Application engine <span class="tag tag-blue">Consumer</span></div>
+      </div>
+
+      <div style="margin-bottom:0.5rem;">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">Room status — last received reading</div>
+        <div class="state-grid" id="state-grid"></div>
+      </div>
+
+      <hr class="divider-line">
+      <div class="panel-title" style="margin-bottom:6px;font-size:11px;">Alert event log <span class="tag tag-red">reactions</span></div>
+      <div class="feed-box" id="alert-feed"><span class="feed-empty">No events yet…</span></div>
+
+      <hr class="divider-line">
+      <div class="panel-title" style="margin-bottom:8px;font-size:11px;">Threshold configuration <span class="tag tag-green">editable</span></div>
+      <div class="thresh-grid">
+        <div class="thresh-block">
+          <div class="thresh-title">Temperature (°C)</div>
+          <div class="thresh-row"><span class="thresh-lbl">Warning</span><input class="thresh-input" id="t-warn" type="number" value="35"></div>
+          <div class="thresh-row"><span class="thresh-lbl">Critical</span><input class="thresh-input" id="t-crit" type="number" value="40"></div>
+        </div>
+        <div class="thresh-block">
+          <div class="thresh-title">Humidity (%RH)</div>
+          <div class="thresh-row"><span class="thresh-lbl">Warning</span><input class="thresh-input" id="h-warn" type="number" value="70"></div>
+          <div class="thresh-row"><span class="thresh-lbl">Critical</span><input class="thresh-input" id="h-crit" type="number" value="80"></div>
+        </div>
+      </div>
+      <button class="apply-btn" onclick="applyThresholds()">apply thresholds &#8635;</button>
+    </div>
+
+  </div>
+
+  <div class="section-label">temperature trend — last 30 transmissions</div>
+  <div class="chart-panel">
+    <div class="chart-top">
+      <span style="font-size:11px;color:var(--text2);">°C per room over time</span>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-sq" style="background:#f0a500"></div>Elec Room A</div>
+        <div class="legend-item"><div class="legend-sq" style="background:#5b9cf6"></div>MCC Room B</div>
+        <div class="legend-item"><div class="legend-sq" style="background:#2dd4a0"></div>Control C</div>
+        <div class="legend-item"><div class="legend-sq" style="background:rgba(240,90,90,0.7);border:1px dashed #f05a5a"></div>Critical threshold</div>
+      </div>
+    </div>
+    <div style="position:relative;height:220px;"><canvas id="trendChart"></canvas></div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-left">Envi Guard · DTO5389 Digital Transformation Technologies · Group 4 · uOttawa · 2026</div>
+  <div class="footer-right">Simulation only — no real hardware connected</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const ROOMS = [
+  { id:'A', name:'Elec Room A', temp:28, hum:52 },
+  { id:'B', name:'MCC Room B',  temp:32, hum:65 },
+  { id:'C', name:'Control C',   temp:24, hum:48 },
+];
+let msgCount = 0, intervalSec = 3, intervalId = null, startTime = Date.now();
+const prevStatus = {A:'ok',B:'ok',C:'ok'};
+let trendData = {A:[],B:[],C:[]}, trendLabels = [], chart;
+
+function getT() {
+  return {
+    tWarn: parseFloat(document.getElementById('t-warn').value)||35,
+    tCrit: parseFloat(document.getElementById('t-crit').value)||40,
+    hWarn: parseFloat(document.getElementById('h-warn').value)||70,
+    hCrit: parseFloat(document.getElementById('h-crit').value)||80,
+  };
+}
+function status(temp,hum) {
+  const t=getT();
+  if(temp>=t.tCrit||hum>=t.hCrit) return 'crit';
+  if(temp>=t.tWarn||hum>=t.hWarn) return 'warn';
+  return 'ok';
+}
+function fillCol(val,warn,crit) {
+  if(val>=crit) return '#f05a5a';
+  if(val>=warn) return '#f0a500';
+  return '#2dd4a0';
+}
+function ts() { return new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+function buildControls() {
+  document.getElementById('room-controls').innerHTML = ROOMS.map(r=>`
+    <div style="margin-bottom:0.9rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;font-weight:500;color:var(--text);">${r.name}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text2);" id="rv-${r.id}">${r.temp.toFixed(1)}°C · ${r.hum.toFixed(0)}%RH</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:2px;display:flex;justify-content:space-between;"><span>Temperature</span><span id="ts-${r.id}">${r.temp.toFixed(1)}°C</span></div>
+      <input type="range" class="temp-range" min="15" max="60" step="0.5" value="${r.temp}" oninput="setTemp('${r.id}',this.value)">
+      <div class="mini-bar"><div class="mini-fill" id="tb-${r.id}" style="width:${Math.round(r.temp/60*100)}%;background:${fillCol(r.temp,35,40)};"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:2px;display:flex;justify-content:space-between;"><span>Humidity</span><span id="hs-${r.id}">${r.hum.toFixed(0)}%RH</span></div>
+      <input type="range" class="hum-range" min="20" max="100" step="1" value="${r.hum}" oninput="setHum('${r.id}',this.value)">
+      <div class="mini-bar"><div class="mini-fill" id="hb-${r.id}" style="width:${r.hum}%;background:${fillCol(r.hum,70,80)};"></div></div>
+    </div>
+  `).join('');
+}
+
+function buildStateGrid() {
+  document.getElementById('state-grid').innerHTML = ROOMS.map(r=>`
+    <div class="state-card s-ok" id="sc-${r.id}">
+      <div class="sc-name" id="scn-${r.id}">${r.name}</div>
+      <div class="sc-temp" id="sct-${r.id}">—</div>
+      <div class="sc-hum" id="sch-${r.id}">— %RH</div>
+    </div>
+  `).join('');
+}
+
+function setTemp(id,val) {
+  const r=ROOMS.find(x=>x.id===id); r.temp=parseFloat(val);
+  const t=getT();
+  document.getElementById(`rv-${id}`).textContent=`${r.temp.toFixed(1)}°C · ${r.hum.toFixed(0)}%RH`;
+  document.getElementById(`ts-${id}`).textContent=`${r.temp.toFixed(1)}°C`;
+  document.getElementById(`tb-${id}`).style.width=Math.round(r.temp/60*100)+'%';
+  document.getElementById(`tb-${id}`).style.background=fillCol(r.temp,t.tWarn,t.tCrit);
+}
+function setHum(id,val) {
+  const r=ROOMS.find(x=>x.id===id); r.hum=parseFloat(val);
+  const t=getT();
+  document.getElementById(`rv-${id}`).textContent=`${r.temp.toFixed(1)}°C · ${r.hum.toFixed(0)}%RH`;
+  document.getElementById(`hs-${id}`).textContent=`${r.hum.toFixed(0)}%RH`;
+  document.getElementById(`hb-${id}`).style.width=r.hum+'%';
+  document.getElementById(`hb-${id}`).style.background=fillCol(r.hum,t.hWarn,t.hCrit);
+}
+function updateInterval(val) {
+  intervalSec=parseInt(val);
+  document.getElementById('interval-lbl').textContent=val+'s';
+  clearInterval(intervalId);
+  intervalId=setInterval(transmit,intervalSec*1000);
+}
+function applyThresholds() {
+  ROOMS.forEach(r=>{ prevStatus[r.id]=''; });
+  ROOMS.forEach(r=>refreshConsumer(r, status(r.temp,r.hum)));
+  updateSummary();
+}
+
+function transmit() {
+  const log=document.getElementById('stream-log');
+  const t=getT();
+  ROOMS.forEach(r=>{
+    msgCount++;
+    const noise=(Math.random()-0.5)*0.4;
+    const payload={
+      device_id:`LHT65-${r.id}`,
+      room:r.name,
+      timestamp:new Date().toISOString(),
+      temp_c:parseFloat((r.temp+noise).toFixed(2)),
+      humidity_rh:parseFloat((r.hum+(Math.random()-0.5)*0.6).toFixed(1)),
+      battery_v:3.2,
+      rssi:-Math.round(70+Math.random()*15),
+      sf:7
+    };
+    const s=status(payload.temp_c,payload.humidity_rh);
+    const line=document.createElement('div');
+    line.className=`log-line ${s==='crit'?'lc':s==='warn'?'lw':''}`;
+    line.textContent=`[${ts()}] ${payload.device_id} temp:${payload.temp_c}°C hum:${payload.humidity_rh}%RH rssi:${payload.rssi}dBm`;
+    if(log.querySelector('.log-empty')) log.innerHTML='';
+    log.prepend(line);
+    if(log.children.length>50) log.removeChild(log.lastChild);
+    refreshConsumer(payload,s,r.id);
+    updateTrend(r.id,payload.temp_c);
+  });
+  document.getElementById('msg-count').textContent=msgCount+' messages sent';
+  updateSummary();
+}
+
+function refreshConsumer(payload,s,id) {
+  const sc=document.getElementById(`sc-${id}`);
+  const scn=document.getElementById(`scn-${id}`);
+  const sct=document.getElementById(`sct-${id}`);
+  const sch=document.getElementById(`sch-${id}`);
+  const t=getT();
+  if(!sc) return;
+  sc.className=`state-card s-${s}`;
+  scn.className=`sc-name ${s==='crit'?'sc':s==='warn'?'sw':''}`;
+  sct.className=`sc-temp ${s==='crit'?'sc':s==='warn'?'sw':''}`;
+  sct.textContent=(payload.temp_c||ROOMS.find(r=>r.id===id).temp).toFixed(1)+'°C';
+  sch.textContent=(payload.humidity_rh||ROOMS.find(r=>r.id===id).hum).toFixed(1)+' %RH';
+
+  if(s!==prevStatus[id]) {
+    const feed=document.getElementById('alert-feed');
+    if(feed.querySelector('.feed-empty')) feed.innerHTML='';
+    const item=document.createElement('div');
+    item.className=`feed-item ${s==='crit'?'fc':s==='warn'?'fw':'fo'}`;
+    let msg='';
+    const name=ROOMS.find(r=>r.id===id).name;
+    if(s==='crit') {
+      if((payload.temp_c||0)>=t.tCrit) msg=`CRITICAL: ${name} temp ${(payload.temp_c).toFixed(1)}°C ≥ ${t.tCrit}°C — email dispatched`;
+      else msg=`CRITICAL: ${name} humidity ${(payload.humidity_rh).toFixed(1)}%RH ≥ ${t.hCrit}%RH — email dispatched`;
+    } else if(s==='warn') {
+      if((payload.temp_c||0)>=t.tWarn) msg=`WARNING: ${name} temp ${(payload.temp_c).toFixed(1)}°C — approaching limit`;
+      else msg=`WARNING: ${name} humidity ${(payload.humidity_rh).toFixed(1)}%RH — approaching limit`;
+    } else {
+      msg=`RESOLVED: ${name} back within normal range`;
+    }
+    item.innerHTML=`<span class="feed-ts">[${ts()}]</span><span class="feed-msg">${msg}</span>`;
+    feed.prepend(item);
+    if(feed.children.length>30) feed.removeChild(feed.lastChild);
+    prevStatus[id]=s;
+  }
+}
+
+function updateSummary() {
+  const t=getT();
+  let alertCount=0;
+  ROOMS.forEach(r=>{ if(status(r.temp,r.hum)!=='ok') alertCount++; });
+  const hotRoom=ROOMS.reduce((a,b)=>a.temp>b.temp?a:b);
+  const alertEl=document.getElementById('sum-alerts');
+  alertEl.textContent=alertCount;
+  alertEl.className=`sum-value ${alertCount===0?'sv-ok':alertCount>=2?'sv-crit':'sv-warn'}`;
+  document.getElementById('sum-msgs').textContent=msgCount;
+  const hotEl=document.getElementById('sum-hot');
+  hotEl.textContent=hotRoom.temp.toFixed(1)+'°C';
+  hotEl.className=`sum-value ${status(hotRoom.temp,hotRoom.hum)==='crit'?'sv-crit':status(hotRoom.temp,hotRoom.hum)==='warn'?'sv-warn':''}`;
+  document.getElementById('sum-hot-name').textContent=hotRoom.name;
+  const elapsed=Math.floor((Date.now()-startTime)/1000);
+  document.getElementById('sum-uptime').textContent=elapsed<60?elapsed+'s':Math.floor(elapsed/60)+'m '+elapsed%60+'s';
+}
+
+function initTrend() {
+  for(let i=29;i>=0;i--) trendLabels.push('');
+  ROOMS.forEach(r=>{ trendData[r.id]=Array(30).fill(null); });
+  const t=getT();
+  chart=new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{
+      labels:trendLabels,
+      datasets:[
+        ...ROOMS.map((r,i)=>({
+          label:r.name,
+          data:trendData[r.id],
+          borderColor:['#f0a500','#5b9cf6','#2dd4a0'][i],
+          backgroundColor:'transparent',
+          borderWidth:1.5,
+          pointRadius:0,
+          tension:0.4,
+          spanGaps:true
+        })),
+        {
+          label:'Critical threshold',
+          data:Array(30).fill(t.tCrit),
+          borderColor:'rgba(240,90,90,0.5)',
+          backgroundColor:'transparent',
+          borderWidth:1,
+          borderDash:[4,4],
+          pointRadius:0,
+          tension:0
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      animation:{duration:200},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{font:{size:9},color:'#555c70',maxTicksLimit:6},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'}},
+        y:{ticks:{font:{size:9,family:'IBM Plex Mono'},color:'#555c70',callback:v=>v+'°C'},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'},min:10,max:65}
+      }
+    }
+  });
+}
+
+function updateTrend(id,val) {
+  if(!chart) return;
+  trendData[id].shift(); trendData[id].push(val);
+  const now=new Date();
+  trendLabels.shift(); trendLabels.push(now.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+  const t=getT();
+  chart.data.datasets[3].data=Array(30).fill(t.tCrit);
+  chart.data.labels=trendLabels;
+  chart.data.datasets.forEach((ds,i)=>{ if(i<3) ds.data=trendData[ROOMS[i].id]; });
+  chart.update('none');
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+buildControls();
+buildStateGrid();
+initTrend();
+updateClock();
+transmit();
+intervalId=setInterval(transmit,intervalSec*1000);
+setInterval(updateClock,1000);
+setInterval(updateSummary,1000);
+</script>
+</body>
+</html>
