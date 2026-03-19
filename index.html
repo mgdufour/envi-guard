@@ -7,46 +7,23 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #0e1117;
-  --bg2: #161b25;
-  --bg3: #1d2535;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.14);
-  --text: #e8eaf0;
-  --text2: #8b90a0;
-  --text3: #555c70;
-  --amber: #f0a500;
-  --amber-dim: rgba(240,165,0,0.12);
-  --amber-dim2: rgba(240,165,0,0.22);
-  --teal: #2dd4a0;
-  --teal-dim: rgba(45,212,160,0.1);
-  --red: #f05a5a;
-  --red-dim: rgba(240,90,90,0.12);
-  --red-dim2: rgba(240,90,90,0.22);
-  --blue: #5b9cf6;
-  --blue-dim: rgba(91,156,246,0.1);
-  --green: #5ec97a;
-  --green-dim: rgba(94,201,122,0.1);
-  --font: 'IBM Plex Sans', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+  --bg: #0e1117; --bg2: #161b25; --bg3: #1d2535;
+  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+  --text: #e8eaf0; --text2: #8b90a0; --text3: #555c70;
+  --amber: #f0a500; --amber-dim: rgba(240,165,0,0.12); --amber-dim2: rgba(240,165,0,0.22);
+  --teal: #2dd4a0; --teal-dim: rgba(45,212,160,0.1);
+  --red: #f05a5a; --red-dim: rgba(240,90,90,0.12); --red-dim2: rgba(240,90,90,0.22);
+  --blue: #5b9cf6; --blue-dim: rgba(91,156,246,0.1);
+  --green: #5ec97a; --green-dim: rgba(94,201,122,0.1);
+  --font: 'IBM Plex Sans', sans-serif; --mono: 'IBM Plex Mono', monospace;
 }
-
 html { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.6; }
 body { min-height: 100vh; padding: 0 0 3rem; }
 
-.site-header {
-  background: var(--bg); border-bottom: 1px solid var(--border);
-  padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
-  height: 56px; position: sticky; top: 0; z-index: 100;
-}
+.site-header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
 .logo { display: flex; align-items: center; gap: 10px; }
-.logo-mark {
-  width: 28px; height: 28px; border-radius: 6px;
-  background: var(--amber-dim2); border: 1px solid var(--amber);
-  display: flex; align-items: center; justify-content: center;
-}
+.logo-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--amber-dim2); border: 1px solid var(--amber); display: flex; align-items: center; justify-content: center; }
 .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); animation: pulse 2.5s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
 .logo-name { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; color: var(--text); }
@@ -58,25 +35,11 @@ body { min-height: 100vh; padding: 0 0 3rem; }
 .clock { font-family: var(--mono); font-size: 12px; color: var(--text2); min-width: 80px; text-align: right; }
 
 .main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 0; }
-
-.section-label {
-  font-family: var(--mono); font-size: 10px; font-weight: 500;
-  color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;
-}
+.section-label { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
 .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.arch-bar {
-  display: flex; align-items: center;
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 8px; padding: 10px 16px; margin-bottom: 1.25rem;
-  overflow-x: auto; white-space: nowrap;
-}
-.arch-node {
-  font-family: var(--mono); font-size: 11px; font-weight: 500;
-  padding: 4px 10px; border-radius: 4px; color: var(--teal);
-  background: var(--teal-dim); border: 1px solid rgba(45,212,160,0.2); flex-shrink: 0;
-}
+.arch-bar { display: flex; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; margin-bottom: 1.25rem; overflow-x: auto; white-space: nowrap; }
+.arch-node { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 4px; color: var(--teal); background: var(--teal-dim); border: 1px solid rgba(45,212,160,0.2); flex-shrink: 0; }
 .arch-arrow { color: var(--text3); padding: 0 8px; font-size: 12px; flex-shrink: 0; }
 
 .summary-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 1.25rem; }
@@ -117,10 +80,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .mini-fill { height: 100%; border-radius: 1px; transition: width 0.25s, background 0.25s; }
 .divider-line { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
 
-.log-box {
-  background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px;
-  font-family: var(--mono); font-size: 11px; height: 140px; overflow-y: auto; display: flex; flex-direction: column-reverse;
-}
+.log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; height: 140px; overflow-y: auto; display: flex; flex-direction: column-reverse; }
 .log-box::-webkit-scrollbar { width: 4px; }
 .log-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 .log-line { padding: 1px 0; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
@@ -169,17 +129,26 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .csv-stats { display: flex; gap: 16px; flex-wrap: wrap; }
 .csv-stat { font-family: var(--mono); font-size: 11px; color: var(--text3); }
 .csv-stat span { color: var(--teal); font-weight: 500; }
-.csv-preview {
-  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-  padding: 8px 10px; font-family: var(--mono); font-size: 11px; color: var(--text3);
-  height: 130px; overflow-y: auto; margin-bottom: 0.75rem;
-}
+.csv-stat span.at-limit { color: var(--amber); }
+.csv-stat span.over-limit { color: var(--red); }
+
+/* Row limit control */
+.limit-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+.limit-lbl { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.limit-select { font-family: var(--mono); font-size: 11px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 4px; padding: 2px 6px; color: var(--text); outline: none; cursor: pointer; }
+.limit-select:focus { border-color: var(--amber); }
+.limit-info { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: auto; }
+.limit-progress { flex: 1; height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; min-width: 60px; }
+.limit-fill { height: 100%; border-radius: 2px; background: var(--teal); transition: width 0.3s, background 0.3s; }
+
+.csv-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; color: var(--text3); height: 130px; overflow-y: auto; margin-bottom: 0.75rem; }
 .csv-preview::-webkit-scrollbar { width: 4px; }
 .csv-preview::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 .csv-row { padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
 .csv-row.header-row { color: var(--text2); font-weight: 500; border-bottom: 1px solid var(--border); margin-bottom: 3px; padding-bottom: 3px; }
 .csv-row.warn-row { color: var(--amber); }
 .csv-row.crit-row { color: var(--red); }
+
 .btn-row { display: flex; gap: 8px; }
 .dl-btn { flex: 1; padding: 8px 12px; font-family: var(--mono); font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.15s; border: 1px solid; }
 .dl-btn-primary { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
@@ -188,6 +157,10 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .dl-btn-secondary:hover { background: var(--bg3); color: var(--text2); }
 .dl-btn-danger { background: transparent; border-color: var(--border2); color: var(--text3); }
 .dl-btn-danger:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+
+/* Limit reached banner */
+.limit-banner { display: none; align-items: center; gap: 8px; background: var(--amber-dim); border: 1px solid rgba(240,165,0,0.3); border-radius: 6px; padding: 6px 10px; margin-bottom: 0.75rem; font-family: var(--mono); font-size: 11px; color: var(--amber); }
+.limit-banner.visible { display: flex; }
 
 .chart-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem; }
 .chart-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 8px; }
@@ -241,7 +214,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   <div class="summary-strip">
     <div class="sum-card"><div class="sum-label">active alerts</div><div class="sum-value sv-ok" id="sum-alerts">0</div><div class="sum-sub">across all rooms</div></div>
     <div class="sum-card"><div class="sum-label">messages sent</div><div class="sum-value" id="sum-msgs">0</div><div class="sum-sub">MQTT payloads</div></div>
-    <div class="sum-card"><div class="sum-label">rows logged</div><div class="sum-value sv-ok" id="sum-rows">0</div><div class="sum-sub">CSV records</div></div>
+    <div class="sum-card"><div class="sum-label">rows logged</div><div class="sum-value sv-ok" id="sum-rows">0</div><div class="sum-sub" id="sum-rows-sub">of unlimited</div></div>
     <div class="sum-card"><div class="sum-label">hottest room</div><div class="sum-value" id="sum-hot">--°C</div><div class="sum-sub" id="sum-hot-name">—</div></div>
     <div class="sum-card"><div class="sum-label">uptime</div><div class="sum-value sv-ok" id="sum-uptime">0s</div><div class="sum-sub">since page load</div></div>
   </div>
@@ -312,6 +285,26 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
         <div class="csv-stat">size: <span id="csv-size">0 B</span></div>
       </div>
     </div>
+
+    <!-- Row limit control -->
+    <div class="limit-row">
+      <span class="limit-lbl">Row limit</span>
+      <select class="limit-select" id="row-limit" onchange="updateRowLimit(this.value)">
+        <option value="0">Unlimited</option>
+        <option value="100">100 rows</option>
+        <option value="300">300 rows</option>
+        <option value="500" selected>500 rows</option>
+        <option value="1000">1,000 rows</option>
+        <option value="5000">5,000 rows</option>
+      </select>
+      <div class="limit-progress"><div class="limit-fill" id="limit-fill" style="width:0%"></div></div>
+      <span class="limit-info" id="limit-info">500 max · oldest rows dropped when full</span>
+    </div>
+
+    <div class="limit-banner" id="limit-banner">
+      &#9888; Row limit reached — oldest readings are being dropped to make room for new ones
+    </div>
+
     <div class="csv-preview" id="csv-preview">
       <div class="csv-row header-row">timestamp,device_id,room,temp_c,humidity_rh,battery_v,rssi,sf,status</div>
     </div>
@@ -345,44 +338,92 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const ROOMS = [
-  { id:'A', name:'Elec Room A', temp:28, hum:52 },
-  { id:'B', name:'MCC Room B',  temp:32, hum:65 },
-  { id:'C', name:'Control C',   temp:24, hum:48 },
+const ROOMS=[
+  {id:'A',name:'Elec Room A',temp:28,hum:52},
+  {id:'B',name:'MCC Room B', temp:32,hum:65},
+  {id:'C',name:'Control C',  temp:24,hum:48},
 ];
 
-let msgCount=0, intervalSec=3, intervalId=null, startTime=Date.now();
+let msgCount=0,intervalSec=3,intervalId=null,startTime=Date.now();
 const prevStatus={A:'ok',B:'ok',C:'ok'};
-let trendData={A:[],B:[],C:[]}, trendLabels=[], chart;
-let csvRows=[], warnCount=0, critCount=0;
+let trendData={A:[],B:[],C:[]},trendLabels=[],chart;
+let csvRows=[],warnCount=0,critCount=0;
+let rowLimit=500; // default
 
-function getT() {
-  return {
+function getT(){
+  return{
     tWarn:parseFloat(document.getElementById('t-warn').value)||35,
     tCrit:parseFloat(document.getElementById('t-crit').value)||40,
     hWarn:parseFloat(document.getElementById('h-warn').value)||70,
     hCrit:parseFloat(document.getElementById('h-crit').value)||80,
   };
 }
-function getStatus(temp,hum) {
+function getStatus(temp,hum){
   const t=getT();
   if(temp>=t.tCrit||hum>=t.hCrit) return 'critical';
   if(temp>=t.tWarn||hum>=t.hWarn) return 'warning';
   return 'normal';
 }
-function fillCol(val,warn,crit) {
+function fillCol(val,warn,crit){
   if(val>=crit) return '#f05a5a';
   if(val>=warn) return '#f0a500';
   return '#2dd4a0';
 }
-function ts() { return new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
-function isoTs() { return new Date().toISOString(); }
+function ts(){return new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function isoTs(){return new Date().toISOString();}
+
+// ── Row limit ──
+function updateRowLimit(val){
+  rowLimit=parseInt(val)||0;
+  const info=document.getElementById('limit-info');
+  if(rowLimit===0){
+    info.textContent='unlimited — all readings kept';
+  } else {
+    info.textContent=rowLimit.toLocaleString()+' max · oldest rows dropped when full';
+  }
+  // Update summary card subtitle
+  document.getElementById('sum-rows-sub').textContent=rowLimit===0?'of unlimited':'of '+rowLimit.toLocaleString();
+  updateLimitProgress();
+}
+
+function updateLimitProgress(){
+  const fill=document.getElementById('limit-fill');
+  const banner=document.getElementById('limit-banner');
+  const rowEl=document.getElementById('csv-row-count');
+  if(rowLimit===0){
+    fill.style.width='0%';
+    fill.style.background='#2dd4a0';
+    banner.classList.remove('visible');
+    rowEl.className='';
+    return;
+  }
+  const pct=Math.min(100,Math.round(csvRows.length/rowLimit*100));
+  fill.style.width=pct+'%';
+  if(pct>=100){
+    fill.style.background='#f05a5a';
+    banner.classList.add('visible');
+    rowEl.className='over-limit';
+  } else if(pct>=80){
+    fill.style.background='#f0a500';
+    banner.classList.remove('visible');
+    rowEl.className='at-limit';
+  } else {
+    fill.style.background='#2dd4a0';
+    banner.classList.remove('visible');
+    rowEl.className='';
+  }
+}
 
 // ── CSV logging ──
-function logToCSV(payload, status) {
-  csvRows.push({...payload, status});
+function logToCSV(payload,status){
+  // Enforce row limit — drop oldest if needed
+  if(rowLimit>0 && csvRows.length>=rowLimit){
+    csvRows.shift(); // remove oldest row
+  }
+  csvRows.push({...payload,status});
   if(status==='warning') warnCount++;
   if(status==='critical') critCount++;
+
   const preview=document.getElementById('csv-preview');
   const line=document.createElement('div');
   line.className=`csv-row ${status==='critical'?'crit-row':status==='warning'?'warn-row':''}`;
@@ -390,16 +431,18 @@ function logToCSV(payload, status) {
   preview.appendChild(line);
   preview.scrollTop=preview.scrollHeight;
   if(preview.children.length>61) preview.removeChild(preview.children[1]);
+
   updateCSVStats();
+  updateLimitProgress();
 }
 
-function buildCSVString() {
+function buildCSVString(){
   const hdr='timestamp,device_id,room,temp_c,humidity_rh,battery_v,rssi,sf,status';
   const rows=csvRows.map(r=>`${r.timestamp},${r.device_id},"${r.room}",${r.temp_c},${r.humidity_rh},${r.battery_v},${r.rssi},${r.sf},${r.status}`);
-  return [hdr,...rows].join('\n');
+  return[hdr,...rows].join('\n');
 }
 
-function updateCSVStats() {
+function updateCSVStats(){
   document.getElementById('csv-row-count').textContent=csvRows.length;
   document.getElementById('csv-warn-count').textContent=warnCount;
   document.getElementById('csv-crit-count').textContent=critCount;
@@ -408,34 +451,35 @@ function updateCSVStats() {
   document.getElementById('csv-size').textContent=bytes<1024?bytes+' B':(bytes/1024).toFixed(1)+' KB';
 }
 
-function downloadCSV() {
+function downloadCSV(){
   if(!csvRows.length){alert('No data yet — wait for a few transmissions.');return;}
   const blob=new Blob([buildCSVString()],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url; a.download=`envi-guard-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;
-  a.click(); URL.revokeObjectURL(url);
+  a.href=url;a.download=`envi-guard-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;
+  a.click();URL.revokeObjectURL(url);
 }
 
-function downloadJSON() {
+function downloadJSON(){
   if(!csvRows.length){alert('No data yet — wait for a few transmissions.');return;}
   const blob=new Blob([JSON.stringify(csvRows,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url; a.download=`envi-guard-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`;
-  a.click(); URL.revokeObjectURL(url);
+  a.href=url;a.download=`envi-guard-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`;
+  a.click();URL.revokeObjectURL(url);
 }
 
-function clearLog() {
+function clearLog(){
   if(!csvRows.length) return;
   if(!confirm('Clear all logged data? This cannot be undone.')) return;
-  csvRows=[]; warnCount=0; critCount=0;
+  csvRows=[];warnCount=0;critCount=0;
   document.getElementById('csv-preview').innerHTML='<div class="csv-row header-row">timestamp,device_id,room,temp_c,humidity_rh,battery_v,rssi,sf,status</div>';
   updateCSVStats();
+  updateLimitProgress();
 }
 
 // ── Controls ──
-function buildControls() {
+function buildControls(){
   document.getElementById('room-controls').innerHTML=ROOMS.map(r=>`
     <div style="margin-bottom:0.9rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -452,7 +496,7 @@ function buildControls() {
   `).join('');
 }
 
-function buildStateGrid() {
+function buildStateGrid(){
   document.getElementById('state-grid').innerHTML=ROOMS.map(r=>`
     <div class="state-card s-ok" id="sc-${r.id}">
       <div class="sc-name" id="scn-${r.id}">${r.name}</div>
@@ -462,36 +506,36 @@ function buildStateGrid() {
   `).join('');
 }
 
-function setTemp(id,val) {
-  const r=ROOMS.find(x=>x.id===id); r.temp=parseFloat(val);
+function setTemp(id,val){
+  const r=ROOMS.find(x=>x.id===id);r.temp=parseFloat(val);
   const t=getT();
   document.getElementById(`rv-${id}`).textContent=`${r.temp.toFixed(1)}°C · ${r.hum.toFixed(0)}%RH`;
   document.getElementById(`ts-${id}`).textContent=`${r.temp.toFixed(1)}°C`;
   document.getElementById(`tb-${id}`).style.width=Math.round(r.temp/60*100)+'%';
   document.getElementById(`tb-${id}`).style.background=fillCol(r.temp,t.tWarn,t.tCrit);
 }
-function setHum(id,val) {
-  const r=ROOMS.find(x=>x.id===id); r.hum=parseFloat(val);
+function setHum(id,val){
+  const r=ROOMS.find(x=>x.id===id);r.hum=parseFloat(val);
   const t=getT();
   document.getElementById(`rv-${id}`).textContent=`${r.temp.toFixed(1)}°C · ${r.hum.toFixed(0)}%RH`;
   document.getElementById(`hs-${id}`).textContent=`${r.hum.toFixed(0)}%RH`;
   document.getElementById(`hb-${id}`).style.width=r.hum+'%';
   document.getElementById(`hb-${id}`).style.background=fillCol(r.hum,t.hWarn,t.hCrit);
 }
-function updateInterval(val) {
+function updateInterval(val){
   intervalSec=parseInt(val);
   document.getElementById('interval-lbl').textContent=val+'s';
   clearInterval(intervalId);
   intervalId=setInterval(transmit,intervalSec*1000);
 }
-function applyThresholds() {
+function applyThresholds(){
   ROOMS.forEach(r=>{prevStatus[r.id]='';});
   ROOMS.forEach(r=>refreshConsumer({temp_c:r.temp,humidity_rh:r.hum},getStatus(r.temp,r.hum),r.id));
   updateSummary();
 }
 
 // ── Transmit ──
-function transmit() {
+function transmit(){
   const log=document.getElementById('stream-log');
   ROOMS.forEach(r=>{
     msgCount++;
@@ -512,7 +556,7 @@ function transmit() {
     if(log.querySelector('.log-empty')) log.innerHTML='';
     log.prepend(line);
     if(log.children.length>50) log.removeChild(log.lastChild);
-    logToCSV(payload, s);
+    logToCSV(payload,s);
     refreshConsumer(payload,s,r.id);
     updateTrend(r.id,payload.temp_c);
   });
@@ -520,7 +564,7 @@ function transmit() {
   updateSummary();
 }
 
-function refreshConsumer(payload,s,id) {
+function refreshConsumer(payload,s,id){
   const sc=document.getElementById(`sc-${id}`);
   if(!sc) return;
   const t=getT();
@@ -531,18 +575,18 @@ function refreshConsumer(payload,s,id) {
   sct.className=`sc-temp ${nc}`;
   sct.textContent=payload.temp_c.toFixed(1)+'°C';
   document.getElementById(`sch-${id}`).textContent=payload.humidity_rh.toFixed(1)+' %RH';
-  if(s!==prevStatus[id]) {
+  if(s!==prevStatus[id]){
     const feed=document.getElementById('alert-feed');
     if(feed.querySelector('.feed-empty')) feed.innerHTML='';
     const item=document.createElement('div');
     item.className=`feed-item ${s==='critical'?'fc':s==='warning'?'fw':'fo'}`;
     const name=ROOMS.find(r=>r.id===id).name;
     let msg='';
-    if(s==='critical') {
+    if(s==='critical'){
       msg=payload.temp_c>=t.tCrit
         ?`CRITICAL: ${name} temp ${payload.temp_c.toFixed(1)}°C ≥ ${t.tCrit}°C — email dispatched`
         :`CRITICAL: ${name} humidity ${payload.humidity_rh.toFixed(1)}%RH ≥ ${t.hCrit}%RH — email dispatched`;
-    } else if(s==='warning') {
+    } else if(s==='warning'){
       msg=payload.temp_c>=t.tWarn
         ?`WARNING: ${name} temp ${payload.temp_c.toFixed(1)}°C — approaching limit`
         :`WARNING: ${name} humidity ${payload.humidity_rh.toFixed(1)}%RH — approaching limit`;
@@ -556,7 +600,7 @@ function refreshConsumer(payload,s,id) {
   }
 }
 
-function updateSummary() {
+function updateSummary(){
   let alertCount=0;
   ROOMS.forEach(r=>{if(getStatus(r.temp,r.hum)!=='normal') alertCount++;});
   const hotRoom=ROOMS.reduce((a,b)=>a.temp>b.temp?a:b);
@@ -573,7 +617,7 @@ function updateSummary() {
   document.getElementById('sum-uptime').textContent=elapsed<60?elapsed+'s':Math.floor(elapsed/60)+'m '+elapsed%60+'s';
 }
 
-function initTrend() {
+function initTrend(){
   for(let i=29;i>=0;i--) trendLabels.push('');
   ROOMS.forEach(r=>{trendData[r.id]=Array(30).fill(null);});
   chart=new Chart(document.getElementById('trendChart'),{
@@ -582,19 +626,19 @@ function initTrend() {
       labels:trendLabels,
       datasets:[
         ...ROOMS.map((r,i)=>({
-          label:r.name, data:trendData[r.id],
+          label:r.name,data:trendData[r.id],
           borderColor:['#f0a500','#5b9cf6','#2dd4a0'][i],
-          backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.4, spanGaps:true
+          backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:0.4,spanGaps:true
         })),
         {
-          label:'Critical', data:Array(30).fill(getT().tCrit),
-          borderColor:'rgba(240,90,90,0.5)', backgroundColor:'transparent',
-          borderWidth:1, borderDash:[4,4], pointRadius:0, tension:0
+          label:'Critical',data:Array(30).fill(getT().tCrit),
+          borderColor:'rgba(240,90,90,0.5)',backgroundColor:'transparent',
+          borderWidth:1,borderDash:[4,4],pointRadius:0,tension:0
         }
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false, animation:{duration:200},
+      responsive:true,maintainAspectRatio:false,animation:{duration:200},
       plugins:{legend:{display:false}},
       scales:{
         x:{ticks:{font:{size:9},color:'#555c70',maxTicksLimit:6},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.08)'}},
@@ -604,17 +648,17 @@ function initTrend() {
   });
 }
 
-function updateTrend(id,val) {
+function updateTrend(id,val){
   if(!chart) return;
-  trendData[id].shift(); trendData[id].push(val);
-  trendLabels.shift(); trendLabels.push(new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+  trendData[id].shift();trendData[id].push(val);
+  trendLabels.shift();trendLabels.push(new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
   chart.data.datasets[3].data=Array(30).fill(getT().tCrit);
   chart.data.labels=trendLabels;
   chart.data.datasets.forEach((ds,i)=>{if(i<3) ds.data=trendData[ROOMS[i].id];});
   chart.update('none');
 }
 
-function updateClock() {
+function updateClock(){
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 
@@ -622,6 +666,7 @@ buildControls();
 buildStateGrid();
 initTrend();
 updateClock();
+updateRowLimit(500); // set default display
 transmit();
 intervalId=setInterval(transmit,intervalSec*1000);
 setInterval(updateClock,1000);
