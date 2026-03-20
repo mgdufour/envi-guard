@@ -71,6 +71,24 @@ body { min-height: 100vh; padding: 0 0 3rem; }
 .gw-status-badge { margin-left: auto; font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
 .gw-status-badge.online { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(45,212,160,0.2); }
 .gw-status-badge.offline { background: var(--red-dim); color: var(--red); border: 1px solid rgba(240,90,90,0.2); }
+
+/* Gateway toggle switch */
+.gw-toggle-row { display: flex; align-items: center; gap: 8px; margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid var(--border); }
+.gw-toggle-lbl { font-family: var(--mono); font-size: 10px; color: var(--text3); flex: 1; }
+.toggle-switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--teal); border-radius: 20px; transition: background 0.3s; }
+.toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: transform 0.3s; }
+.toggle-switch input:not(:checked) + .toggle-slider { background: var(--red); }
+.toggle-switch input:not(:checked) + .toggle-slider:before { transform: translateX(0px); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); }
+.gw-card.offline-card { opacity: 0.55; border-color: rgba(240,90,90,0.3); }
+.gw-offline-banner { display: none; align-items: center; gap: 6px; background: var(--red-dim); border: 1px solid rgba(240,90,90,0.3); border-radius: 4px; padding: 4px 8px; margin-top: 6px; font-family: var(--mono); font-size: 10px; color: var(--red); }
+.gw-offline-banner.visible { display: flex; }
+
+/* Both gateways offline warning */
+.both-offline-banner { display: none; align-items: center; gap: 8px; background: var(--red-dim2); border: 1px solid rgba(240,90,90,0.4); border-radius: 8px; padding: 10px 14px; margin-bottom: 1rem; font-family: var(--mono); font-size: 11px; color: var(--red); }
+.both-offline-banner.visible { display: flex; }
 .gw-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 0.75rem; }
 .gw-metric { background: var(--bg); border-radius: 4px; padding: 5px 8px; }
 .gw-metric-lbl { display: block; font-size: 9px; color: var(--text3); font-family: var(--mono); margin-bottom: 1px; }
@@ -264,50 +282,70 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
   <div class="section-label">cisco lorawan gateways — IXM-LPWA-900-16-K9</div>
   <div class="gateway-strip">
-    <div class="gw-card">
+    <div class="gw-card" id="gw1-card">
       <div class="gw-card-top">
         <div class="gw-icon">GW</div>
         <div>
           <div class="gw-model">Cisco IXM-LPWA-900</div>
           <div class="gw-id">GW-CIS-01 · Floor 1 / East Wing</div>
         </div>
-        <div class="gw-status-badge online">Online</div>
+        <div class="gw-status-badge online" id="gw1-badge">Online</div>
       </div>
       <div class="gw-metrics">
         <div class="gw-metric"><span class="gw-metric-lbl">RSSI</span><span class="gw-metric-val" id="gw1-rssi">-78 dBm</span></div>
         <div class="gw-metric"><span class="gw-metric-lbl">SF</span><span class="gw-metric-val">SF7</span></div>
         <div class="gw-metric"><span class="gw-metric-lbl">ADR</span><span class="gw-metric-val teal">Enabled</span></div>
         <div class="gw-metric"><span class="gw-metric-lbl">Packets</span><span class="gw-metric-val" id="gw1-packets">0</span></div>
-        <div class="gw-metric"><span class="gw-metric-lbl">GPS sync</span><span class="gw-metric-val teal">Active</span></div>
-        <div class="gw-metric"><span class="gw-metric-lbl">Role</span><span class="gw-metric-val">Primary</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">GPS sync</span><span class="gw-metric-val teal" id="gw1-gps">Active</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">Role</span><span class="gw-metric-val" id="gw1-role">Primary</span></div>
       </div>
       <div class="gw-bar-row">
         <span class="gw-bar-lbl">Signal strength</span>
         <div class="gw-signal-bar"><div class="gw-signal-fill" id="gw1-signal" style="width:72%"></div></div>
       </div>
+      <div class="gw-offline-banner" id="gw1-offline-banner">&#9888; Gateway offline — traffic failing over to GW-CIS-02</div>
+      <div class="gw-toggle-row">
+        <span class="gw-toggle-lbl" id="gw1-toggle-lbl">Gateway online — click to simulate failure</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="gw1-toggle" checked onchange="toggleGateway(1, this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
     </div>
-    <div class="gw-card">
+    <div class="gw-card" id="gw2-card">
       <div class="gw-card-top">
         <div class="gw-icon">GW</div>
         <div>
           <div class="gw-model">Cisco IXM-LPWA-900</div>
           <div class="gw-id">GW-CIS-02 · Floor 2 / West Wing</div>
         </div>
-        <div class="gw-status-badge online">Online</div>
+        <div class="gw-status-badge online" id="gw2-badge">Online</div>
       </div>
       <div class="gw-metrics">
         <div class="gw-metric"><span class="gw-metric-lbl">RSSI</span><span class="gw-metric-val" id="gw2-rssi">-81 dBm</span></div>
         <div class="gw-metric"><span class="gw-metric-lbl">SF</span><span class="gw-metric-val">SF7</span></div>
         <div class="gw-metric"><span class="gw-metric-lbl">ADR</span><span class="gw-metric-val teal">Enabled</span></div>
         <div class="gw-metric"><span class="gw-metric-lbl">Packets</span><span class="gw-metric-val" id="gw2-packets">0</span></div>
-        <div class="gw-metric"><span class="gw-metric-lbl">GPS sync</span><span class="gw-metric-val teal">Active</span></div>
-        <div class="gw-metric"><span class="gw-metric-lbl">Role</span><span class="gw-metric-val">Redundant</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">GPS sync</span><span class="gw-metric-val teal" id="gw2-gps">Active</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">Role</span><span class="gw-metric-val" id="gw2-role">Redundant</span></div>
       </div>
       <div class="gw-bar-row">
         <span class="gw-bar-lbl">Signal strength</span>
         <div class="gw-signal-bar"><div class="gw-signal-fill" id="gw2-signal" style="width:65%"></div></div>
       </div>
+      <div class="gw-offline-banner" id="gw2-offline-banner">&#9888; Gateway offline — traffic failing over to GW-CIS-01</div>
+      <div class="gw-toggle-row">
+        <span class="gw-toggle-lbl" id="gw2-toggle-lbl">Gateway online — click to simulate failure</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="gw2-toggle" checked onchange="toggleGateway(2, this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
     </div>
+  </div>
+
+  <div class="both-offline-banner" id="both-offline-banner">
+    &#9888; Both gateways offline — data stream interrupted. This demonstrates Risk ID 3 from the project risk register.
   </div>
 
   <div class="summary-strip">
@@ -622,23 +660,105 @@ function clearLog(){
 }
 
 let gw1Packets=0, gw2Packets=0;
+let gw1Online=true, gw2Online=true;
+
+function toggleGateway(gw, online) {
+  if(gw===1) gw1Online=online;
+  if(gw===2) gw2Online=online;
+
+  const card=document.getElementById(`gw${gw}-card`);
+  const badge=document.getElementById(`gw${gw}-badge`);
+  const banner=document.getElementById(`gw${gw}-offline-banner`);
+  const lbl=document.getElementById(`gw${gw}-toggle-lbl`);
+  const gps=document.getElementById(`gw${gw}-gps`);
+  const role=document.getElementById(`gw${gw}-role`);
+  const signal=document.getElementById(`gw${gw}-signal`);
+
+  if(online){
+    card.className='gw-card';
+    badge.className='gw-status-badge online';
+    badge.textContent='Online';
+    banner.classList.remove('visible');
+    lbl.textContent='Gateway online — click to simulate failure';
+    gps.textContent='Active';
+    gps.className='gw-metric-val teal';
+    signal.style.background='var(--blue)';
+  } else {
+    card.className='gw-card offline-card';
+    badge.className='gw-status-badge offline';
+    badge.textContent='Offline';
+    banner.classList.add('visible');
+    lbl.textContent='Gateway offline — click to restore';
+    gps.textContent='Lost';
+    gps.className='gw-metric-val';
+    gps.style.color='var(--red)';
+    signal.style.width='0%';
+    signal.style.background='var(--red)';
+  }
+
+  // Update roles based on which are online
+  if(gw1Online && !gw2Online){
+    document.getElementById('gw1-role').textContent='Primary + Redundant';
+  } else if(!gw1Online && gw2Online){
+    document.getElementById('gw2-role').textContent='Primary + Redundant';
+  } else {
+    document.getElementById('gw1-role').textContent='Primary';
+    document.getElementById('gw2-role').textContent='Redundant';
+  }
+
+  // Show both offline warning
+  const bothBanner=document.getElementById('both-offline-banner');
+  if(!gw1Online && !gw2Online){
+    bothBanner.classList.add('visible');
+  } else {
+    bothBanner.classList.remove('visible');
+  }
+
+  // Update header gateway status
+  const gwDot=document.querySelector('.gw-dot');
+  const gwText=document.querySelector('.gw-text');
+  if(!gw1Online && !gw2Online){
+    gwDot.style.background='var(--red)';
+    gwText.textContent='Both gateways offline';
+  } else if(!gw1Online || !gw2Online){
+    gwDot.style.background='var(--amber)';
+    gwText.textContent='1 gateway offline';
+  } else {
+    gwDot.style.background='';
+    gwText.textContent='2 gateways online';
+  }
+}
 
 function updateGateways(){
-  // Alternate readings between gateways to simulate redundancy
-  const useGw1 = Math.random() > 0.3;
+  if(!gw1Online && !gw2Online) return;
+
+  // Route packets based on which gateways are online
+  let useGw1;
+  if(gw1Online && gw2Online){
+    useGw1 = Math.random() > 0.3;
+  } else if(gw1Online){
+    useGw1 = true;
+  } else {
+    useGw1 = false;
+  }
+
   if(useGw1){ gw1Packets++; } else { gw2Packets++; }
 
-  const gw1Rssi = -Math.round(72+Math.random()*12);
-  const gw2Rssi = -Math.round(78+Math.random()*14);
-  const gw1Pct = Math.round(Math.max(0, Math.min(100, (120+gw1Rssi)/50*100)));
-  const gw2Pct = Math.round(Math.max(0, Math.min(120+gw2Rssi)/50*100));
+  if(gw1Online){
+    const gw1Rssi=-Math.round(72+Math.random()*12);
+    const gw1Pct=Math.round(Math.max(0,Math.min(100,(120+gw1Rssi)/50*100)));
+    document.getElementById('gw1-rssi').textContent=gw1Rssi+' dBm';
+    document.getElementById('gw1-signal').style.width=gw1Pct+'%';
+  }
+  if(gw2Online){
+    const gw2Rssi=-Math.round(78+Math.random()*14);
+    const gw2Pct=Math.round(Math.max(0,Math.min(100,(120+gw2Rssi)/50*100)));
+    document.getElementById('gw2-rssi').textContent=gw2Rssi+' dBm';
+    document.getElementById('gw2-signal').style.width=gw2Pct+'%';
+  }
 
-  document.getElementById('gw1-rssi').textContent = gw1Rssi+' dBm';
-  document.getElementById('gw2-rssi').textContent = gw2Rssi+' dBm';
-  document.getElementById('gw1-packets').textContent = gw1Packets;
-  document.getElementById('gw2-packets').textContent = gw2Packets;
-  document.getElementById('gw1-signal').style.width = gw1Pct+'%';
-  document.getElementById('gw2-signal').style.width = gw2Pct+'%';
+  document.getElementById('gw1-packets').textContent=gw1Packets;
+  document.getElementById('gw2-packets').textContent=gw2Packets;
 }
 
 function buildControls(){
@@ -697,6 +817,7 @@ function applyThresholds(){
 }
 
 function transmit(){
+  if(!gw1Online && !gw2Online) return;
   const log=document.getElementById('stream-log');
   ROOMS.forEach(r=>{
     msgCount++;
