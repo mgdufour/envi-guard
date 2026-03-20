@@ -120,7 +120,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .mini-fill { height: 100%; border-radius: 1px; transition: width 0.25s, background 0.25s; }
 .divider-line { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
 
-.log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; height: 140px; overflow-y: auto; display: flex; flex-direction: column-reverse; }
+.log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; height: 140px; overflow-y: auto; display: flex; flex-direction: column; }
 .log-box::-webkit-scrollbar { width: 4px; }
 .log-box::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 .log-line { padding: 1px 0; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
@@ -718,8 +718,9 @@ function transmit(){
     line.className=`log-line ${s==='critical'?'lc':s==='warning'?'lw':''}`;
     line.textContent=`[${ts()}] ${payload.device_id} temp:${payload.temp_c}°C hum:${payload.humidity_rh}%RH rssi:${payload.rssi}dBm`;
     if(log.querySelector('.log-empty')) log.innerHTML='';
-    log.prepend(line);
-    if(log.children.length>50) log.removeChild(log.lastChild);
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+    if(log.children.length>50) log.removeChild(log.children[0]);
 
     // Update gateway metrics
     updateGateways();
