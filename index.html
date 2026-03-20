@@ -245,7 +245,14 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     <div class="fb-dot connecting" id="fb-dot"></div>
     <span class="fb-status" id="fb-status">Connecting to Firebase…</span>
     <span class="fb-writes">writes: <span id="fb-write-count">0</span></span>
-    <span class="fb-url">group4-project-73093-default-rtdb.firebaseio.com</span>
+    <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">session:</span>
+        <span style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text2);" id="fb-session-id">—</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid var(--border2);" id="fb-session-badge">—</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);">read: <span id="fb-read-url">—</span></div>
+    </div>
   </div>
 
   <div class="arch-bar">
@@ -443,15 +450,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 let fbWriteCount = 0;
-let fbConnected = false;
+
+// Determine session ID from URL parameter or generate a random one
+const urlParams = new URLSearchParams(window.location.search);
+const sessionId = urlParams.get('session') || 'session-' + Math.random().toString(36).slice(2, 8);
+const isFixed = urlParams.has('session');
+const basePath = `envi-guard/sessions/${sessionId}`;
+
+// Display session info in banner
+document.getElementById('fb-session-id').textContent = sessionId;
+document.getElementById('fb-session-badge').textContent = isFixed ? 'fixed session' : 'random session';
+document.getElementById('fb-session-badge').style.color = isFixed ? 'var(--teal)' : 'var(--amber)';
+document.getElementById('fb-read-url').textContent =
+  `https://group4-project-73093-default-rtdb.firebaseio.com/${basePath}/rooms.json`;
 
 // Update Firebase connection status
 const connRef = ref(db, '.info/connected');
 onValue(connRef, (snap) => {
-  fbConnected = snap.val() === true;
+  const connected = snap.val() === true;
   const dot = document.getElementById('fb-dot');
   const status = document.getElementById('fb-status');
-  if (fbConnected) {
+  if (connected) {
     dot.className = 'fb-dot connected';
     status.textContent = 'Connected to Firebase Realtime Database';
     status.className = 'fb-status connected';
@@ -462,15 +481,15 @@ onValue(connRef, (snap) => {
   }
 });
 
-// Write a reading to Firebase
+// Write a reading to Firebase under the session path
 window.writeToFirebase = function(payload) {
   try {
-    // Write latest reading per room (overwrites — always current state)
-    const roomRef = ref(db, `envi-guard/rooms/${payload.device_id}`);
+    // Latest reading per room — always current state
+    const roomRef = ref(db, `${basePath}/rooms/${payload.device_id}`);
     set(roomRef, payload);
 
-    // Also push to a readings log (append — full history)
-    const logRef = ref(db, 'envi-guard/readings');
+    // Full readings log — append history
+    const logRef = ref(db, `${basePath}/readings`);
     push(logRef, payload);
 
     fbWriteCount++;
@@ -484,9 +503,10 @@ window.writeToFirebase = function(payload) {
   }
 };
 
-// Expose db and ref for groupmate's consumer app
 window.firebaseDb = db;
 window.firebaseRef = ref;
+window.firebaseSessionId = sessionId;
+window.firebaseBasePath = basePath;
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
