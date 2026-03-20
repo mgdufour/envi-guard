@@ -59,6 +59,27 @@ body { min-height: 100vh; padding: 0 0 3rem; }
 .arch-bar { display: flex; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; margin-bottom: 1.25rem; overflow-x: auto; white-space: nowrap; }
 .arch-node { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 4px; color: var(--teal); background: var(--teal-dim); border: 1px solid rgba(45,212,160,0.2); flex-shrink: 0; }
 .arch-node.firebase-node { color: var(--amber); background: var(--amber-dim); border-color: rgba(240,165,0,0.3); }
+.arch-node.cisco-node { color: var(--blue); background: var(--blue-dim); border-color: rgba(91,156,246,0.3); }
+
+/* Gateway cards */
+.gateway-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+.gw-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; }
+.gw-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+.gw-icon { width: 32px; height: 32px; border-radius: 6px; background: var(--blue-dim); border: 1px solid rgba(91,156,246,0.3); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; font-weight: 500; color: var(--blue); flex-shrink: 0; }
+.gw-model { font-size: 12px; font-weight: 500; color: var(--text); }
+.gw-id { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 1px; }
+.gw-status-badge { margin-left: auto; font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
+.gw-status-badge.online { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(45,212,160,0.2); }
+.gw-status-badge.offline { background: var(--red-dim); color: var(--red); border: 1px solid rgba(240,90,90,0.2); }
+.gw-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 0.75rem; }
+.gw-metric { background: var(--bg); border-radius: 4px; padding: 5px 8px; }
+.gw-metric-lbl { display: block; font-size: 9px; color: var(--text3); font-family: var(--mono); margin-bottom: 1px; }
+.gw-metric-val { display: block; font-size: 12px; font-weight: 500; color: var(--text); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.gw-metric-val.teal { color: var(--teal); }
+.gw-bar-row { display: flex; align-items: center; gap: 8px; }
+.gw-bar-lbl { font-size: 10px; color: var(--text3); font-family: var(--mono); white-space: nowrap; }
+.gw-signal-bar { flex: 1; height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.gw-signal-fill { height: 100%; border-radius: 2px; background: var(--blue); transition: width 0.5s; }
 .arch-arrow { color: var(--text3); padding: 0 8px; font-size: 12px; flex-shrink: 0; }
 
 .summary-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 1.25rem; }
@@ -193,6 +214,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   .connector { display: none; }
   .summary-strip { grid-template-columns: 1fr 1fr; }
   .arch-bar { display: none; }
+  .gateway-strip { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -228,9 +250,57 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
   <div class="arch-bar">
     <div class="arch-node">Dragino LHT65</div><div class="arch-arrow">&#8594;</div>
-    <div class="arch-node">LoRaWAN gateway</div><div class="arch-arrow">&#8594;</div>
+    <div class="arch-node cisco-node">Cisco IXM-LPWA-900 ×2</div><div class="arch-arrow">&#8594;</div>
     <div class="arch-node firebase-node">Firebase Realtime DB</div><div class="arch-arrow">&#8594;</div>
     <div class="arch-node">Dashboard + Alerts</div>
+  </div>
+
+  <div class="section-label">cisco lorawan gateways — IXM-LPWA-900-16-K9</div>
+  <div class="gateway-strip">
+    <div class="gw-card">
+      <div class="gw-card-top">
+        <div class="gw-icon">GW</div>
+        <div>
+          <div class="gw-model">Cisco IXM-LPWA-900</div>
+          <div class="gw-id">GW-CIS-01 · Floor 1 / East Wing</div>
+        </div>
+        <div class="gw-status-badge online">Online</div>
+      </div>
+      <div class="gw-metrics">
+        <div class="gw-metric"><span class="gw-metric-lbl">RSSI</span><span class="gw-metric-val" id="gw1-rssi">-78 dBm</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">SF</span><span class="gw-metric-val">SF7</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">ADR</span><span class="gw-metric-val teal">Enabled</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">Packets</span><span class="gw-metric-val" id="gw1-packets">0</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">GPS sync</span><span class="gw-metric-val teal">Active</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">Role</span><span class="gw-metric-val">Primary</span></div>
+      </div>
+      <div class="gw-bar-row">
+        <span class="gw-bar-lbl">Signal strength</span>
+        <div class="gw-signal-bar"><div class="gw-signal-fill" id="gw1-signal" style="width:72%"></div></div>
+      </div>
+    </div>
+    <div class="gw-card">
+      <div class="gw-card-top">
+        <div class="gw-icon">GW</div>
+        <div>
+          <div class="gw-model">Cisco IXM-LPWA-900</div>
+          <div class="gw-id">GW-CIS-02 · Floor 2 / West Wing</div>
+        </div>
+        <div class="gw-status-badge online">Online</div>
+      </div>
+      <div class="gw-metrics">
+        <div class="gw-metric"><span class="gw-metric-lbl">RSSI</span><span class="gw-metric-val" id="gw2-rssi">-81 dBm</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">SF</span><span class="gw-metric-val">SF7</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">ADR</span><span class="gw-metric-val teal">Enabled</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">Packets</span><span class="gw-metric-val" id="gw2-packets">0</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">GPS sync</span><span class="gw-metric-val teal">Active</span></div>
+        <div class="gw-metric"><span class="gw-metric-lbl">Role</span><span class="gw-metric-val">Redundant</span></div>
+      </div>
+      <div class="gw-bar-row">
+        <span class="gw-bar-lbl">Signal strength</span>
+        <div class="gw-signal-bar"><div class="gw-signal-fill" id="gw2-signal" style="width:65%"></div></div>
+      </div>
+    </div>
   </div>
 
   <div class="summary-strip">
@@ -531,6 +601,26 @@ function clearLog(){
   updateCSVStats();updateLimitProgress();
 }
 
+let gw1Packets=0, gw2Packets=0;
+
+function updateGateways(){
+  // Alternate readings between gateways to simulate redundancy
+  const useGw1 = Math.random() > 0.3;
+  if(useGw1){ gw1Packets++; } else { gw2Packets++; }
+
+  const gw1Rssi = -Math.round(72+Math.random()*12);
+  const gw2Rssi = -Math.round(78+Math.random()*14);
+  const gw1Pct = Math.round(Math.max(0, Math.min(100, (120+gw1Rssi)/50*100)));
+  const gw2Pct = Math.round(Math.max(0, Math.min(120+gw2Rssi)/50*100));
+
+  document.getElementById('gw1-rssi').textContent = gw1Rssi+' dBm';
+  document.getElementById('gw2-rssi').textContent = gw2Rssi+' dBm';
+  document.getElementById('gw1-packets').textContent = gw1Packets;
+  document.getElementById('gw2-packets').textContent = gw2Packets;
+  document.getElementById('gw1-signal').style.width = gw1Pct+'%';
+  document.getElementById('gw2-signal').style.width = gw2Pct+'%';
+}
+
 function buildControls(){
   document.getElementById('room-controls').innerHTML=ROOMS.map(r=>`
     <div style="margin-bottom:0.9rem;">
@@ -610,6 +700,9 @@ function transmit(){
     if(log.querySelector('.log-empty')) log.innerHTML='';
     log.prepend(line);
     if(log.children.length>50) log.removeChild(log.lastChild);
+
+    // Update gateway metrics
+    updateGateways();
 
     // Write to Firebase
     if(window.writeToFirebase) window.writeToFirebase(payload);
