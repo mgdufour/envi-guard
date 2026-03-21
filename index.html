@@ -366,8 +366,8 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
       </div>
       <div class="interval-row">
         <span class="interval-lbl">Transmit interval</span>
-        <input type="range" class="temp-range" min="1" max="10" step="1" value="3" id="interval-slider" style="flex:1;" oninput="updateInterval(this.value)">
-        <span class="interval-val" id="interval-lbl">3s</span>
+        <input type="range" class="temp-range" min="1" max="10" step="1" value="5" id="interval-slider" style="flex:1;" oninput="updateInterval(this.value)">
+        <span class="interval-val" id="interval-lbl">5s</span>
       </div>
       <div id="room-controls"></div>
       <hr class="divider-line">
@@ -555,7 +555,7 @@ const ROOMS=[
   {id:'C',name:'Control C',  temp:24,hum:48},
 ];
 
-let msgCount=0,intervalSec=3,intervalId=null,startTime=Date.now();
+let msgCount=0,intervalSec=5,intervalId=null,startTime=Date.now();
 const prevStatus={A:'ok',B:'ok',C:'ok'};
 let trendData={A:[],B:[],C:[]},trendLabels=[],chart;
 let csvRows=[],warnCount=0,critCount=0,rowLimit=500;
