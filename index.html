@@ -439,7 +439,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     </div>
     <div class="limit-banner" id="limit-banner">&#9888; Row limit reached — oldest readings are being dropped</div>
     <div class="csv-preview" id="csv-preview">
-      <div class="csv-row header-row">timestamp,device_id,room,temp_c,humidity_rh,battery_v,rssi,sf,status</div>
+      <div class="csv-row header-row">timestamp,device_id,room,temp_c,humidity_rh,battery_v,sf,gateway_id,gateway_rssi,failover,gateways_online,status</div>
     </div>
     <div class="btn-row">
       <button class="dl-btn dl-btn-primary" onclick="downloadCSV()">&#8595; download CSV</button>
@@ -610,7 +610,7 @@ function logToCSV(payload,status){
   const preview=document.getElementById('csv-preview');
   const line=document.createElement('div');
   line.className=`csv-row ${status==='critical'?'crit-row':status==='warning'?'warn-row':''}`;
-  line.textContent=`${payload.timestamp},${payload.device_id},"${payload.room}",${payload.temp_c},${payload.humidity_rh},${payload.battery_v},${payload.rssi},${payload.sf},${status}`;
+  line.textContent=`${payload.timestamp},${payload.device_id},"${payload.room}",${payload.temp_c},${payload.humidity_rh},${payload.battery_v},${payload.sf},${payload.gateway_id},${payload.gateway_rssi},${payload.failover},${payload.gateways_online},${status}`;
   preview.appendChild(line);
   preview.scrollTop=preview.scrollHeight;
   if(preview.children.length>61) preview.removeChild(preview.children[1]);
@@ -619,8 +619,8 @@ function logToCSV(payload,status){
 }
 
 function buildCSVString(){
-  const hdr='timestamp,device_id,room,temp_c,humidity_rh,battery_v,rssi,sf,status';
-  const rows=csvRows.map(r=>`${r.timestamp},${r.device_id},"${r.room}",${r.temp_c},${r.humidity_rh},${r.battery_v},${r.rssi},${r.sf},${r.status}`);
+  const hdr='timestamp,device_id,room,temp_c,humidity_rh,battery_v,sf,gateway_id,gateway_rssi,failover,gateways_online,status';
+  const rows=csvRows.map(r=>`${r.timestamp},${r.device_id},"${r.room}",${r.temp_c},${r.humidity_rh},${r.battery_v},${r.sf},${r.gateway_id},${r.gateway_rssi},${r.failover},${r.gateways_online},${r.status}`);
   return[hdr,...rows].join('\n');
 }
 
@@ -655,7 +655,7 @@ function clearLog(){
   if(!csvRows.length) return;
   if(!confirm('Clear all logged data?')) return;
   csvRows=[];warnCount=0;critCount=0;
-  document.getElementById('csv-preview').innerHTML='<div class="csv-row header-row">timestamp,device_id,room,temp_c,humidity_rh,battery_v,rssi,sf,status</div>';
+  document.getElementById('csv-preview').innerHTML='<div class="csv-row header-row">timestamp,device_id,room,temp_c,humidity_rh,battery_v,sf,gateway_id,gateway_rssi,failover,gateways_online,status</div>';
   updateCSVStats();updateLimitProgress();
 }
 
@@ -819,6 +819,23 @@ function applyThresholds(){
 function transmit(){
   if(!gw1Online && !gw2Online) return;
   const log=document.getElementById('stream-log');
+
+  // Determine which gateway is routing this transmission
+  const failover = (!gw1Online && gw2Online) || (gw1Online && !gw2Online);
+  let activeGwId, activeGwRssi;
+  if(gw1Online && gw2Online){
+    // Both online — alternate between them
+    const useGw1 = Math.random() > 0.4;
+    activeGwId = useGw1 ? 'GW-CIS-01' : 'GW-CIS-02';
+    activeGwRssi = useGw1 ? -Math.round(72+Math.random()*12) : -Math.round(78+Math.random()*14);
+  } else if(gw1Online){
+    activeGwId = 'GW-CIS-01';
+    activeGwRssi = -Math.round(72+Math.random()*12);
+  } else {
+    activeGwId = 'GW-CIS-02';
+    activeGwRssi = -Math.round(78+Math.random()*14);
+  }
+
   ROOMS.forEach(r=>{
     msgCount++;
     const payload={
@@ -828,16 +845,20 @@ function transmit(){
       temp_c:parseFloat((r.temp+(Math.random()-0.5)*0.4).toFixed(2)),
       humidity_rh:parseFloat((r.hum+(Math.random()-0.5)*0.6).toFixed(1)),
       battery_v:3.2,
-      rssi:-Math.round(70+Math.random()*15),
-      sf:7
+      sf:7,
+      gateway_id:activeGwId,
+      gateway_rssi:activeGwRssi,
+      failover:failover,
+      gateways_online: (gw1Online ? 1 : 0) + (gw2Online ? 1 : 0)
     };
     const s=getStatus(payload.temp_c,payload.humidity_rh);
     payload.status=s;
 
     // Log to MQTT stream display
     const line=document.createElement('div');
-    line.className=`log-line ${s==='critical'?'lc':s==='warning'?'lw':''}`;
-    line.textContent=`[${ts()}] ${payload.device_id} temp:${payload.temp_c}°C hum:${payload.humidity_rh}%RH rssi:${payload.rssi}dBm`;
+    const failoverTag = failover ? ' ⚡FAILOVER' : '';
+    line.className=`log-line ${s==='critical'?'lc':s==='warning'?'lw':failover?'lw':''}`;
+    line.textContent=`[${ts()}] ${payload.device_id} via ${activeGwId}${failoverTag} temp:${payload.temp_c}°C hum:${payload.humidity_rh}%RH rssi:${activeGwRssi}dBm`;
     if(log.querySelector('.log-empty')) log.innerHTML='';
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
